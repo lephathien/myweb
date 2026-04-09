@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sản phẩm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        html::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+
+        .container > h1:first-child {
+            color: #333;
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        #logout-btn {
+            padding: 10px 24px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        #logout-btn:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        #logout-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-add {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-add:active {
+            transform: translateY(0);
+        }
+
+        .add-product-form {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: none;
+            border: 2px solid #e0e7ff;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .add-product-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-actions {
+            margin-top: 20px;
+        }
+
+        .btn-submit {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(81, 207, 102, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(81, 207, 102, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .table-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        th:first-child,
+        th:last-child {
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9ff;
+            transform: scale(1.01);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        td {
+            padding: 16px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        td:first-child {
+            text-align: center;
+            font-weight: 700;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        td img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        td img:hover {
+            transform: scale(1.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-edit {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(255, 165, 0, 0.3);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+        }
+
+        .btn-edit:active {
+            transform: translateY(0);
+        }
+
+        .btn-delete {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-delete:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            td img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Trang quản lý admin</h1>
+        <div class="header">
+            <h1>Quản lý sản phẩm</h1>
+            <button id="logout-btn">Đăng xuất</button>
+        </div>
+        
+        <button id="add-form-btn" class="btn-add">Thêm sản phẩm mới</button>
+        
+        <div id="add-product-form" class="add-product-form">
+            <form id="product-form">
+                <div class="form-group">
+                    <label>Tên sản phẩm</label>
+                    <input type="text" id="product-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Giá</label>
+                    <input type="number" id="product-price" required>
+                </div>
+                <div class="form-group">
+                    <label>URL hình ảnh</label>
+                    <input type="text" id="product-image" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Thêm sản phẩm</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="product-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+    <script src="./configFirebase.js"></script>
+    <script>
+        // Xử lý đăng xuất
+        document
+            .getElementById("logout-btn")
+            .addEventListener("click", function () {
+                if (confirm("Bạn có chắc chắn muốn đăng xuất")) {
+                    firebase
+                        .auth()
+                        .signOut()
+                        .then(() => {
+                            // Xóa thông tin phiên người dùng khỏi localStorage
+                            localStorage.removeItem("user_session");
+
+                            // Chuyển hướng tới trang đăng nhập
+                            window.location.href = "./login.html";
+                        })
+                        .catch((error) => {
+                            console.log("Lỗi đăng xuất:", error.message);
+                        });
+                }
+            });
+
+        // Hiển thị form thêm sản phẩm
+        document.getElementById('add-form-btn').addEventListener('click', function() {
+            const form = document.getElementById('add-product-form');
+            form.classList.toggle('active');
+        });
+
+        // Thêm sản phẩm
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('product-name').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const imageUrl = document.getElementById('product-image').value;
+
+            const productData = {
+                name: name,
+                price: price,
+                imageUrl: imageUrl,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            db.collection('products').add(productData)
+                .then(() => {
+                    alert('Thêm sản phẩm thành công!');
+                    document.getElementById('product-form').reset();
+                    document.getElementById('add-product-form').classList.remove('active');
+                    loadProducts();
+                })
+                .catch((error) => {
+                    console.error('Error adding product: ', error);
+                    alert('Lỗi khi thêm sản phẩm!');
+                });
+        });
+
+        // Xóa sản phẩm
+        function deleteProduct(productId) {
+            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+                db.collection('products').doc(productId).delete()
+                    .then(() => {
+                        alert('Xóa sản phẩm thành công!');
+                        loadProducts();
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting product: ', error);
+                        alert('Lỗi khi xóa sản phẩm!');
+                    });
+            }
+        }
+
+        // Hàm load sản phẩm từ Firestore
+        function loadProducts() {
+            const tableBody = document.querySelector("#product-table-body");
+            let htmls = "";
+
+            db.collection("products")
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px; color: #999;">Chưa có sản phẩm nào</td></tr>';
+                        return;
+                    }
+
+                    let index = 1;
+                    querySnapshot.forEach((doc) => {
+                        const product = doc.data();
+                        htmls += `
+                            <tr>
+                                <td style="text-align: center; font-weight: 600;">${index++}</td>
+                                <td><img src="${product.imageUrl}" alt="${product.name}"></td>
+                                <td>${product.name}</td>
+                                <td style="font-weight: 600; color: #667eea;">${product.price.toLocaleString('vi-VN')}₫</td>
+                                <td>
+                                    <div class="product-actions">
+                                        <button class="btn-edit" onclick="editProduct('${doc.id}')">Sửa</button>
+                                        <button class="btn-delete" onclick="deleteProduct('${doc.id}')">Xóa</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tableBody.innerHTML = htmls;
+                })
+                .catch((error) => {
+                    console.error("Error fetching products: ", error);
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px; color: #d63031;">Lỗi khi tải sản phẩm</td></tr>';
+                });
+        }
+        loadProducts();
+    </script>
+
+</body>
+
+</html>
